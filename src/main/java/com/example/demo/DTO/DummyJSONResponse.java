@@ -4,7 +4,7 @@ import java.util.List;
 
 // The root wrapper object DummyJSON returns
 public record DummyJSONResponse(
-        List<Proizvod> products,
+        List<Product> products,
         int total,
         int skip,
         int limit

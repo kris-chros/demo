@@ -2,7 +2,7 @@ package com.example.demo.DTO;
 
 import java.util.List;
 
-public record Proizvod(
+public record Product(
         Integer id,
         String title,
         String description,
@@ -26,6 +26,8 @@ public record Proizvod(
         List<String> images,
         String thumbnail
     ) {
+
+
         @Override
         public Integer id() {
             return id;

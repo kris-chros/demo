@@ -36,7 +36,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String role = claims.get("role", String.class);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                // Manually inject the user and their role into the Security Context
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         username, null, List.of(new SimpleGrantedAuthority(role))
                 );

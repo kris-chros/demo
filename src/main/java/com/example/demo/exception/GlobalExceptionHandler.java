@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice // Automatically intercepts exceptions thrown by any Controller
+@RestControllerAdvice // Automatsko presretanje iznimki svih Controllera
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleProductNotFound(NotFoundException ex) {
+    public ResponseEntity<Map<String, Object>> handleProductNotFound(NotFoundException ex) { //pregledniji ispis
         Map<String, Object> errorBody = new HashMap<>();
         errorBody.put("timestamp", LocalDateTime.now());
         errorBody.put("status", HttpStatus.NOT_FOUND.value());

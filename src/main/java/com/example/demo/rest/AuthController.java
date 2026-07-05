@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthController { // Controller za autentifikaciju
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -26,21 +26,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        System.out.println(">>> CONTROLLER REACHED: Attempting login for " + request.username());
-        // 1. Authenticate the user.
-        // If the password doesn't match the database hash, this throws a BadCredentialsException.
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.username(), request.password())
         );
 
-        // 2. Extract the authenticated user.
-        // Assuming your UserDetailsService returns your CustomUser entity.
         CustomUser user = (CustomUser) authentication.getPrincipal();
-
-        // 3. Generate the token containing the username and role.
         String token = jwtService.generateToken(user);
 
-        // 4. Return the JWT to the client.
         return ResponseEntity.ok(new AuthResponse(token));
     }
 }

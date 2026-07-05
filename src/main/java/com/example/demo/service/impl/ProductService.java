@@ -1,32 +1,28 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.DTO.DummyJSONResponse;
-import com.example.demo.DTO.Proizvod;
-import com.example.demo.DTO.ProizvodSkraceno;
+import com.example.demo.DTO.Product;
+import com.example.demo.DTO.ProductShort;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import com.example.demo.exception.NotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class ProizvodService implements com.example.demo.service.ProizvodService {
+public class ProductService implements com.example.demo.service.ProductService {
 
     private final RestClient restClient;
 
-    public ProizvodService() {
-        // Initialize RestClient with the base URL of DummyJSON
-        this.restClient = RestClient.builder()
-                .baseUrl("https://dummyjson.com")
-                .build();
+    public ProductService(RestClient dummyJsonClient) {
+        this.restClient = dummyJsonClient;
     }
 
     @Override
-    public ProizvodSkraceno toSummary(Proizvod proizvod) {
-        String rawDesc = proizvod.description();
+    public ProductShort toSummary(Product product) { // skraćeni proizvod
+        String rawDesc = product.description();
         String truncatedDesc = "";
 
         if (rawDesc != null) {
@@ -35,17 +31,17 @@ public class ProizvodService implements com.example.demo.service.ProizvodService
                     : rawDesc.substring(0, 97) + "..."; // 97 chars + 3 dots = 100 total
         }
 
-        return new ProizvodSkraceno(
-                proizvod.thumbnail(), // Mapping 'thumbnail' to 'picture'
-                proizvod.title(),
-                proizvod.price(),
+        return new ProductShort(
+                product.thumbnail(),
+                product.title(),
+                product.price(),
                 truncatedDesc
         );
     }
 
     @Override
     @Cacheable(value = "productsCache") // cacheing dohvat proizvoda za ponovnu uporabu
-    public List<Proizvod> fetchAllProducts() {
+    public List<Product> fetchAllProducts() {
         DummyJSONResponse responseP = restClient.get()
                 .uri("/products")
                 .retrieve()
@@ -58,19 +54,20 @@ public class ProizvodService implements com.example.demo.service.ProizvodService
 
     @Override
     @Cacheable(value = "singleProductCache", key = "#id")
-    public Proizvod fetchProduct(Integer id){ // dohvat jednog proizvoda koji se onda cacheira po id-u
+    public Product fetchProduct(Integer id){ // dohvat jednog proizvoda koji se onda cacheira po id-u
         return restClient.get()
                 .uri("/products/" + id)
                 .retrieve()
                 .onStatus(status -> status.value() == 404, (request, response) -> {
                     throw new NotFoundException("Product with ID " + id + " does not exist.");
                 })
-                .body(Proizvod.class);
+                .body(Product.class);
     }
 
     @Override
     @Cacheable(value = "filteredProductsCache", key = "#category + ':' + #lowerPrice + ':' + #higherPrice")
-    public List<Proizvod> fetchProductsByPriceAndCategory(String category, Double lowerPrice, Double higherPrice) {
+    public List<Product> fetchProductsByPriceAndCategory(String category, Double lowerPrice, Double higherPrice) {
+        // dohvat proizvoda filtriranih po cijeni i kategoriji
         return fetchAllProducts().stream()
                 .filter(p -> p.price() >= lowerPrice && p.price() <= higherPrice)
                 .filter(p -> "all".equals(category) || p.category().equalsIgnoreCase(category))
@@ -78,8 +75,8 @@ public class ProizvodService implements com.example.demo.service.ProizvodService
     }
 
     @Override
-    public List<Proizvod> fetchProductsByName(String searchWord) {
-        List<Proizvod> sviProizvodi = fetchAllProducts();
+    public List<Product> fetchProductsByName(String searchWord) { // dohvat proizvoda po imenu
+        List<Product> sviProizvodi = fetchAllProducts();
         if (searchWord == null || searchWord.isBlank()){
             return sviProizvodi;
         }

@@ -1,6 +1,6 @@
 package com.example.demo.DTO;
 
-public record ProizvodSkraceno(
+public record ProductShort(
         String picture,
         String title,
         Double price,

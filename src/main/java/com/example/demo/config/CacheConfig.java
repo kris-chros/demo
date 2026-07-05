@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-@EnableCaching // Turns on Spring's caching infrastructure
+@EnableCaching // Spring cachiranje uključeno
 public class CacheConfig {
 
     @Bean
@@ -19,10 +19,8 @@ public class CacheConfig {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCacheNames(List.of("productsCache", "singleProductCache", "filteredProductsCache"));
         cacheManager.setCaffeine(Caffeine.newBuilder()
-                // Evict entries 10 minutes after they are written to the cache
-                .expireAfterWrite(10, TimeUnit.MINUTES)
-                // Maximum number of entries this cache can hold
-                .maximumSize(100));
+                .expireAfterWrite(10, TimeUnit.MINUTES) // Unosi se brišu iz cachea 10 minuta nakon što su uneseni
+                .maximumSize(1000)); // Maksimalan broj unosa koji može biti istovremeno u cacheu
         return cacheManager;
     }
 }
