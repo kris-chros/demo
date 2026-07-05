@@ -78,8 +78,11 @@
 Još neki primjeri za testiranje:
 
 localhost:8080/products/filter?lowerPrice=60&category=fragrances
+
 localhost:8080/products/filter?higherPrice=600&category=groceries - prazna lista
+
 localhost:8080/product?id=15
+
 localhost:8080/products/search?searchText=appl
 
 Za pomoć u rješavanju zadatka korišten je Google Gemini, većinski u Pro Extended načinu rada. Korišten je kao pomoć u učenju novih koncepata (cacheing u Javi) i generiranje dijelova koda.
